@@ -38,7 +38,6 @@ void load_board(const char *filename, char board[9][9]) {
 
   cout << ((row == 9) ? "Success!" : "Failed!") << endl;
   assert(row == 9);
-  delete [] filename; // DRIVER LINE, REMOVE ME!!!!
 }
 
 /* internal helper function */
@@ -73,6 +72,44 @@ void display_board(const char board[9][9]) {
 }
 /////////////////////////////////////// My functions /////////////
 
+bool save_board( const char *outputFileName, char board[][9] )
+{
+    ofstream saveFile;
+    saveFile.open( outputFileName );
+    if( saveFile.fail() )
+    {
+        return false;
+    }
+
+    int row=0, col=0;
+    for( ; row < 9; ++row ) // for each position on board...
+    {
+        col = 0; // reset col
+
+        for( ; col < 9; ++col )
+        {
+            if( board[row][col] == ' ' ) // write '.' for empty position...
+            {
+                saveFile << '.';
+            }
+            else // or write the digit to file.
+            {
+                saveFile << board[row][col];
+            }
+        }
+
+        saveFile << "\n"; 
+    }
+
+    if( !saveFile.fail() && row == 9 && col == 9 ) // if write complete...
+    {
+        return true; // return valid successfull write.
+    }
+    
+    // else the board write did not complete...
+    return false; // so return unsuccessfull write.
+}
+
 char alphaToNum( char alphaRepresentation )
 {
 	return alphaRepresentation - 16;
@@ -82,28 +119,47 @@ char alphaToNum( char alphaRepresentation )
 bool make_move( const char *position, const char value, char board[][9] )
 {
 	int rowIndex, colIndex; 
-	
+    /* Check position points to no longer than a two char string. 
+     * This stops invalid inputs such as "A10" evaluating to "A1". */ 
+    if( *(position+2) != 0 )
+    {
+        cout << "Too long position" << endl;
+        return false;
+    }
+
 	/* Converts both chars in @position into their
 	 * corresponding array indices */
 	rowIndex = alphaToNum((*position) - (1 + '0')); 
 	colIndex = *(++position) - (1 + '0');         
 
-
-	if( (!inRange(rowIndex)) && (!inRange(colIndex)) )// If move not in range...
+	if( (!inRange(rowIndex)) || (!inRange(colIndex)) )// If move not in range...
 	{
+        cout << "Do we get here?" << endl;
 		return false; // return invalid move.
 	}
-	else if ( isDigit(board[rowIndex][colIndex]) ) // If position occupied...
+	else // position is in range.
 	{
-		return false; // return invalid move.
+		return inputValueToBoard( value, &board[rowIndex][colIndex] );
 	}
-	else // Otherwise move is valid...
-	{
-		board[rowIndex][colIndex] = value; // so input @value into board...
-	}
-	return true; // and return valid move.
 
 }
+
+bool inputValueToBoard( char inputDigit, char* position )
+{
+	if ( isDigit( *position ) ) // If position occupied by a digit...
+	{
+		return false; // return invalid move.
+	}
+    else if( isDigit( inputDigit ) ) // if @inputDigit in range...
+    {
+        *position = inputDigit; // add it to board ...
+        return true; // and return valid move.
+    }
+    // else inputDigit not in range...
+    return false; // so return invalid move.
+}
+
+
 
 
 bool is_complete( char board[][9] )
@@ -156,6 +212,19 @@ char* getFileName()
 	return fileName; // return the pointer to use at argument for @load_board
 }
 
-//char* getPositionCoordinates()
+char* getPositionCoordinates()
 {
+    char* position; // create pointer
+    position = new char[10]; // create char array on heap
+    cout << "Please enter position > ";
+    cin.getline( position, 3 );
+    return position;
+}
+
+char getPositionValue()
+{
+    char value;
+    cout << "Please enter value for position > ";
+    cin.get(value);
+    return value;
 }

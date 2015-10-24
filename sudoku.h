@@ -15,6 +15,17 @@ void display_board(const char board[9][9]);
 
 ///////////////////////////////// My functions
 
+bool save_board( const char *outputFileName, char board[9][9] );
+/* Saves a boards current state to a .dat file of name
+ * @outputFileName. .dat file format is readable by
+ * @load_board. */
+
+bool inputValueToBoard( char inputDigit, char* position );
+/* Adds @inputDigit to the board at *@position. Uses array
+ * coordinates, rather than user alpha-num coordinates.
+ * Returns false if @inputDigit is out of range. Range: 1-9
+ * Returns false if *@postiion is currently occupied */ 
+
 char alphaCharToNumChar( char alphaRepresentation );
 /* Converts chars 'A' - 'I' into
  * chars '1' - '9' */
@@ -41,7 +52,7 @@ char* getPositionCoordinates(); // DRIVER FUNCTION
 /* Prompts user for the board coordinates where
  * the user would like to make their next move */
 
-char* getPositionValue(); // DRIVER FUNCTION
+char getPositionValue(); // DRIVER FUNCTION
 /* Prompts the user for the value they wish to input
  * at the board coordinates specified in
  * @getPositionCoordinates */
