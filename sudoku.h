@@ -15,6 +15,37 @@ void display_board(const char board[9][9]);
 
 ///////////////////////////////// My functions
 
+bool processedAllPositions( char board[9][9], bool processedPositions[9][9] );
+/* Identifies new positions on the board that have yet
+ * to be processed. Returns false if all positions have
+ * been processed. */
+
+void updateBoard( char board[9][9], int row, int col, char correctVal );
+/* Submits a known position to the board */
+
+void successfulElimination( char board[9][9], char pCube[9][9][9], int row, int col );
+/* Checks if a board position in pCube contains only 1 
+ * remaining possibility. If true, this char is submitted to
+ * @board using @updateBoard. */
+
+bool solved_board( char board[9][9] );
+/* Sums each row, and sums each column of a board. Signals
+ * board is solved by returning true, if each column or each
+ * row sums to 45.*/
+
+void generatePossibilityCube( char pCube[9][9][9] );
+/* Generates a 3D array of chars. The breadth and depth
+ * of the cube correlate to the positions on the sudoku board.
+ * The height contains each of the possible values a position
+ * can take (chars from '1' to '9'. */
+
+void generateLocationArray( bool processedLocs );
+/* Generates a 2D array of bools. The array positions correlate
+ * to the array positions in the sudoku board. Default is false,
+ * and a position is changed to true when @deleteIncorrectValues
+ * has been called on the position. Important for deciding board
+ * solvability. */
+
 bool save_board( const char *outputFileName, char board[9][9] );
 /* Saves a boards current state to a .dat file of name
  * @outputFileName. .dat file format is readable by
