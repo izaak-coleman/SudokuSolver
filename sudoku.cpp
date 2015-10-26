@@ -70,6 +70,8 @@ void display_board(const char board[9][9]) {
   }
   print_frame(9);
 }
+
+
 /////////////////////////////////////// My functions /////////////
 bool is_complete( char board[][9] )
 {
@@ -85,7 +87,36 @@ bool is_complete( char board[][9] )
 	}
 	return true; // if true returned board is complete
 }
+void elimPossibles(char board[][9], bool procLoc[][9], char pCube[][9][9],
+                   int row, int col, char setBoard )
+{
+    if( (board[row][col] != ' ') && (procLoc[row][col] == false))
+    {
+        procLoc[row][col] = true; // being processing position
+        int indexToEliminate = (board[row][col] - 49); // char to array pos
 
+        if (setBoard == 'y') // if first ever round of elimination
+        {
+            setSuppliedVals( pCube, board, indexToEliminate, row, col ); 
+        }
+
+        elimRowPossibles( pCube, board, row, col, indexToEliminate );
+        elimColPossibles( pCube, board, row, col, indexToEliminate );
+        elimFieldPossibles( pCube, board, row, col, indexToEliminate );
+
+
+        if( col < 9 && row < 9 )
+        {
+            elimPossibles( board, procLoc, pCube, row, col+1 );
+        }
+        else if( col == 9 && row < 9 )
+        {
+            elimPossibles( board, procLoc, pCube, row+1 );
+        }
+    }
+
+    // else, done, and return to caller
+}
 
 bool solve_board (char board[][9] )
 {
@@ -128,13 +159,23 @@ bool solve_board (char board[][9] )
         char guessValue = '1'; 
         do 
         {
+            char emptyPosition[2];
+            int arrayLocation[2];
+
             // add a seed value to board at a position and try and solve.
-            seedBoard( guessValue ); 
+            if(guessValue == '1')
+            {
+                seed_board( board, emptyPosition, guessValue ); 
+                arrayLocation[0] = alphaToNum( emptyPosition[0] ) - 48;
+                arrayLocation[1] = emptyPosition[1] - 48;
+            }
+            board[arrayLocation[0]][arrayLocation[1]] = guessValue;
+            
             while( ! processedAllPositions( board, processedLocations ))
             { 
                 elimPossibles( board, processedLocations, pCube /*r=0,c=0*/ );
             }
-        guessValue++; // try another seed value
+            guessValue++; // try another seed value
         } // whilst not solved.
         while( ! solved_board( board ) || guessValue <= '9' ); 
 
@@ -151,46 +192,105 @@ bool solve_board (char board[][9] )
     }
 }
 
-void elimPossibles(char board[][9], bool procLoc[][9], char pCube[][9][9],
-                   int row=0, int col=0, char setBoard='n')
+
+void elimRowPossibles( char pCube[][9][9], char board[][9], int row, int col,
+                       int indexToEliminate, int rowIt )
 {
-    if( (board[row][col] != ' ') && (procLoc[row][col] == false))
+    if( successfulElimination( board, pCube, rowIt, col ))
     {
-        procLoc[row][col] = true; // being processing position
-        int indexToEliminate = (board[row][col] - 49); // char to array pos
-
-        if (setBoard == 'y') // if first ever round of elimination
+        /* If only one posibility left, move down a row*/
+        elimRowPossibles( pCube, board, row, col, indexToEliminate, rowIt+1 );
+    }
+    else
+    {
+        /* If current row, is row where @elimPossibles was called
+         * skip elimination, move down a row*/
+        if(rowIt == row) 
         {
-            setSuppliedVals( pCube, indexToEliminate ); 
+            elimRowPossibles( pCube, board, row, col, 
+                              indexToEliminate, rowIt+1);
         }
-
-        elimRowPossibles( pCube, row, col, indexToEliminate );
-        elimColPossibles( pCube, row, col, indexToEliminate );
-        elimFieldPossibles( pCube, row, col, indexToEliminate );
-
-
-        if( col < 9 && row < 9 )
+        else if( rowIt < 9 ) // then remove possibility
         {
-            elimPossibles( board, procLoc, pCube, row, col+1 );
-        }
-        else if( col == 9 && row < 9 )
-        {
-            elimPossibles( board, procLoc, pCube, row+1 /*col=0*/ );
+            pCube[rowIt][col][indexToEliminate] = 0;
+            elimRowPossibles( pCube, board, row, col,
+                               indexToEliminate, rowIt+1);
         }
     }
-
-    // else, done, and return to caller
 }
 
-void elimRowPossibles( char pCube[][9][9], int row, int col,
-                       int indexToEliminate, int rowIt=0 )
-{}
-void elimColPossibles( char pCube[][9][9], int row, int col,
-                       int indexToEliminate, int colIt=0 )
-{}
-void elimRowPossibles( char pCube[][9][9], int row, int col,
-                       int indexToEliminate )
-{}
+void elimColPossibles( char pCube[][9][9], char board[][9], int row, int col,
+                       int indexToEliminate, int colIt )
+{
+    if(successfulElimination( board, pCube, row, colIt ))
+    {
+        /* If only one posibility left, move a column to the right */
+        elimColPossibles( pCube, board, row, col, indexToEliminate, colIt+1 );
+    }
+    else
+    {
+        if(colIt == col)
+        {
+            /* If current row is row where @elimPossibles was called
+             * skip elimination, move a column to the right */
+            elimColPossibles( pCube, board, row, col,
+                               indexToEliminate, colIt+1 );
+        }
+        else if( colIt < 9 ) // then remove possibility
+        {
+            pCube[row][colIt][indexToEliminate] = 0;
+            elimColPossibles( pCube, board, row, col,
+                              indexToEliminate, colIt+1 );
+        }
+    }
+}
+
+void elimFieldPossibles( char pCube[][9][9], char board[][9], int row, int col,
+                         int indexToEliminate )
+{
+    //find the field position
+    int fieldRow = row % 3;
+    int fieldCol = col % 3;
+    
+    /* Process each position in the field, removing the possibility
+     * at @indexToEliminate */
+
+    for(int rloc = row-(fieldRow*9); 
+            rloc < row + (9*(2-fieldCol));
+            rloc = rloc + 9 )
+    {
+        for(int cloc = col-fieldCol; cloc < col+fieldCol; cloc++ )
+        {
+            if(rloc == row && cloc == col)
+            {
+                continue;
+            }
+            else
+            {   
+                if( successfulElimination(board, pCube, row, col))
+                {
+                    continue;
+                }
+                pCube[rloc][cloc][indexToEliminate] = 0;
+            }
+        }
+    }
+}
+
+void setSuppliedVals( char pCube[][9][9], char board[][9], 
+                      int correctIndex, int row, int col, 
+                      int indexBaseCase )
+{
+    if( indexBaseCase < 9 ) // Whilst not at end of array
+    {
+        if( indexBaseCase != correctIndex ) // And not at correct value
+        {
+            pCube[row][col][indexBaseCase] = 0; // remove possibility
+        }
+        setSuppliedVals( pCube, board, correctIndex, row, col, 
+                         indexBaseCase+1 ); // iterate through array
+    }
+}
 
 bool processedAllPositions( char board[][9], bool processedPositions[][9] )
 {
@@ -300,6 +400,7 @@ bool save_board( const char *outputFileName, char board[][9] )
         return true; // return valid successfull write.
     }
     
+
     // else the board write did not complete...
     return false; // so return unsuccessfull write.
 }
@@ -309,6 +410,23 @@ char alphaToNum( char alphaRepresentation )
 	return alphaRepresentation - 16;
 }
 
+bool seed_board( char board[][9], char findGuessPosition[], char guessVal  )
+{
+
+    for(char r='A'; r<'J'; r++)
+    {
+        for(int c='1'; c<':'; c++)
+        {
+            findGuessPosition[0] = r;
+            findGuessPosition[1] = c;
+            if(make_move( findGuessPosition, guessVal, board ))
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 bool make_move( const char *position, const char value, char board[][9] )
 {
@@ -317,7 +435,6 @@ bool make_move( const char *position, const char value, char board[][9] )
      * This stops invalid inputs such as "A10" evaluating to "A1". */ 
     if( *(position+2) != 0 )
     {
-        cout << "Too long position" << endl;
         return false;
     }
 
@@ -328,7 +445,6 @@ bool make_move( const char *position, const char value, char board[][9] )
 
 	if( (!inRange(rowIndex)) || (!inRange(colIndex)) )// If move not in range...
 	{
-        cout << "Do we get here?" << endl;
 		return false; // return invalid move.
 	}
 	else // position is in range.
@@ -359,7 +475,9 @@ void updateBoard( char board[][9], int row, int col, char correctVal )
     board[row][col] = correctVal;
 }
 
-void successfulElimination( char board[][9], char pCube[][9][9], int row, int col )
+
+bool successfulElimination( char board[][9], char pCube[][9][9], 
+                            int row, int col )
 {
     int counter = 0;
     char correctValue;
@@ -377,13 +495,11 @@ void successfulElimination( char board[][9], char pCube[][9][9], int row, int co
     if( counter == 1 ) // if only one possibility left...
     {
         updateBoard( board, row, col, correctValue ); // submit it to board.
+        return true;
     }
+
+    return false; // signal multiple possibilities left
 }
-
-
-
-
-
 
 bool inRange( int index )
 {
