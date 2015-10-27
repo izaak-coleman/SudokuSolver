@@ -161,45 +161,48 @@ bool solve_board (char board[][9] )
     {
         return true;  // return completion signal
     }
-    else // Board requires guesswork then more elimination.
-    {
-
-        char guessValue = '9'; 
-
-        char emptyPosition[2];
-        int arrayLocation[2];
-        do 
-        {
-
-            // add a seed value to board at a position and try and solve.
-            if(guessValue <= '9')
-            {
-                seed_board( board, emptyPosition, guessValue ); 
-                arrayLocation[0] = alphaToNum( emptyPosition[0] ) - 48;
-                arrayLocation[1] = emptyPosition[1] - 48;
-            }
-            board[arrayLocation[0]][arrayLocation[1]] = guessValue;
-            
-            while( ! processedAllPositions( board, processedLocations ))
-            { 
-                elimPossibles( board, processedLocations, pCube /*r=0,c=0*/ );
-				display_board( board );
-            }
-            guessValue++; // try another seed value
-        } // whilst not solved.
-        while( ! solved_board( board ) || guessValue <= '9' ); 
-
-
-        if( solved_board( board )) // After trying all seed values, if solved...
-        {
-            return true; // return completion signal
-        }
-        else // board is insolvable
-        {
-            cout << "Insolvable Board!!!" << endl;
-            return false; // 
-        }
-    }
+    cout << "No solution found: " << endl << endl;
+    display_board( board );
+    return false;
+//    else // Board requires guesswork then more elimination.
+//    {
+//
+//        char guessValue = '9'; 
+//
+//        char emptyPosition[2];
+//        int arrayLocation[2];
+//        do 
+//        {
+//
+//            // add a seed value to board at a position and try and solve.
+//            if(guessValue <= '9')
+//            {
+//                seed_board( board, emptyPosition, guessValue ); 
+//                arrayLocation[0] = alphaToNum( emptyPosition[0] ) - 48;
+//                arrayLocation[1] = emptyPosition[1] - 48;
+//            }
+//            board[arrayLocation[0]][arrayLocation[1]] = guessValue;
+//            
+//            while( ! processedAllPositions( board, processedLocations ))
+//            { 
+//                elimPossibles( board, processedLocations, pCube /*r=0,c=0*/ );
+//				display_board( board );
+//            }
+//            guessValue++; // try another seed value
+//        } // whilst not solved.
+//        while( ! solved_board( board ) || guessValue <= '9' ); 
+//
+//
+//        if( solved_board( board )) // After trying all seed values, if solved...
+//        {
+//            return true; // return completion signal
+//        }
+//        else // board is insolvable
+//        {
+//            cout << "Insolvable Board!!!" << endl;
+//            return false; // 
+//        }
+//    }
 }
 
 void elimRowPossibles( char pCube[][9][9], char board[][9], int row, int col,
@@ -207,28 +210,17 @@ void elimRowPossibles( char pCube[][9][9], char board[][9], int row, int col,
 {
 	if( rowIt < 9 )
 	{
-    	if( successfulElimination( board, pCube, rowIt, col ))
-    	{
-    	    /* If only one posibility left, move down a row*/
-    	    elimRowPossibles( pCube, board, row, col, indexToEliminate, rowIt+1 );
-    	}
-    	else
-    	{
-    	    /* If current row, is row where @elimPossibles was called,
-    	     * skip elimination, move down a row*/
-
-    	    if(rowIt == row) 
-    	    {
-    	        elimRowPossibles( pCube, board, row, col, 
-    	                          indexToEliminate, rowIt+1);
-    	    }
-			else if(rowIt < 9) // Remove possibility
-    	    {
-    	        pCube[rowIt][col][indexToEliminate] = 0;
-    	        elimRowPossibles( pCube, board, row, col,
-    	                           indexToEliminate, rowIt+1);
-    	    }
-    	}
+        if(rowIt == row) 
+        {
+            elimRowPossibles( pCube, board, row, col, 
+                              indexToEliminate, rowIt+1);
+        }
+		else if(rowIt < 9) // Remove possibility
+        {
+            pCube[rowIt][col][indexToEliminate] = 0;
+            elimRowPossibles( pCube, board, row, col,
+                               indexToEliminate, rowIt+1);
+        }
 	}
 }
 
@@ -237,27 +229,19 @@ void elimColPossibles( char pCube[][9][9], char board[][9], int row, int col,
 {
 	if( colIt < 9 )
 	{
-    	if(successfulElimination( board, pCube, row, colIt ))
-    	{
-    	    /* If only one posibility left, move a column to the right */
-    	    elimColPossibles( pCube, board, row, col, indexToEliminate, colIt+1 );
-    	}
-    	else
-    	{
-    	    if(colIt == col)
-    	    {
-    	        /* If current row is row where @elimPossibles was called
-    	         * skip elimination, move a column to the right */
-    	        elimColPossibles( pCube, board, row, col,
-    	                           indexToEliminate, colIt+1 );
-    	    }
-    	    else if( colIt < 9 ) // then remove possibility
-    	    {
-    	        pCube[row][colIt][indexToEliminate] = 0;
-    	        elimColPossibles( pCube, board, row, col,
-    	                          indexToEliminate, colIt+1 );
-    	    }
-    	}
+        if(colIt == col)
+        {
+            /* If current row is row where @elimPossibles was called
+             * skip elimination, move a column to the right */
+            elimColPossibles( pCube, board, row, col,
+                               indexToEliminate, colIt+1 );
+        }
+        else if( colIt < 9 ) // then remove possibility
+        {
+            pCube[row][colIt][indexToEliminate] = 0;
+            elimColPossibles( pCube, board, row, col,
+                              indexToEliminate, colIt+1 );
+        }
 	}
 }
 
@@ -284,10 +268,6 @@ void elimFieldPossibles( char pCube[][9][9], char board[][9], int row, int col,
             }
             else
             {   
-                if( successfulElimination(board, pCube, rloc, cloc))
-                {
-                    continue;
-                }
                 pCube[rloc][cloc][indexToEliminate] = 0;
             }
         }
