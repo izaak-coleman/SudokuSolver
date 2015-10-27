@@ -56,7 +56,7 @@ int main() {
       cout << "A solution cannot be found." << endl;
     cout << endl;
   
-    load_board("medium.dat", board);
+    load_board("easy-solution.dat", board);
     if (solve_board(board)) {
       cout << "The 'medium' board has a solution:" << endl;
       display_board(board);

@@ -13,6 +13,8 @@ void load_board(const char *filename, char board[9][9]);
 void display_board(const char board[9][9]);
 
 ///////////////////////////////// My functions 
+bool onlyViableFieldPosition( char board[9][9], int row,
+							  int col, int posVal );
 
 bool solve_board( char board[9][9] );
 /* solves a sudoku board */
