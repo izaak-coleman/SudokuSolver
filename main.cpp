@@ -48,18 +48,19 @@ int main() {
 //  
       cout << " Question 4 ======================" << endl << endl;
   
-    load_board("easy.dat", board);
+    load_board("diab.dat", board);
+	display_board( board );
     if (solve_board(board)) {
-      cout << "The 'easy' board has a solution:" << endl;
-      display_board(board);
+      cout << "The 'worlds toughest.dat' board has a solution:" << endl;
+	  display_board( board );
     } else 
       cout << "A solution cannot be found." << endl;
     cout << endl;
   
     load_board("easy-solution.dat", board);
     if (solve_board(board)) {
-      cout << "The 'medium' board has a solution:" << endl;
-      display_board(board);
+      cout << "The 'easy-solution' board has a solution:" << endl;
+		display_board( board );
     } else 
       cout << "A solution cannot be found." << endl;
     cout << endl;

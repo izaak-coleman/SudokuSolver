@@ -13,7 +13,11 @@ void load_board(const char *filename, char board[9][9]);
 void display_board(const char board[9][9]);
 
 ///////////////////////////////// My functions 
-bool onlyViableFieldPosition( char board[9][9], int row,
+
+void setTestBoard( char baseBoard[9][9], char testBoard[9][9] );
+
+
+bool onlyViableFieldPosition( char pCube[9][9][9], int row,
 							  int col, int posVal );
 
 bool solve_board( char board[9][9] );
@@ -22,7 +26,7 @@ bool solve_board( char board[9][9] );
 char alphaToNum( char alphaRepresentation );
 /* changes alpha char 'A' - 'I' to digit char '1' - '9'*/
 
-bool seed_board( char board[9][9], char findGuessPosition[2],
+void seed_board( char board[9][9], int &r, int &c, 
                  char guessVal );
 /* Finds the first empty position from 0,0 and inputs the
  * value of @guessVal*/

@@ -118,91 +118,69 @@ void elimPossibles(char board[][9], bool procLoc[][9], char pCube[][9][9],
     // else, done, and return to caller
 }
 
-bool solve_board (char board[][9] )
+bool solve_board( char baseBoard[][9] )
 {
-    if ( solved_board( board )) // if board already complete
-    {
-        return true; // return completion signal
-    }
-    /* @pCube stores an array of possible values for each
-     * position on the @board, these values get replaced
-     * with 0 when they are logically eliminated by
-     * @deleteIncorrectValues */
+	char pCube[9][9][9];
+	char testBoard[9][9];
+	bool processedPositions[9][9];
 
-    char pCube[9][9][9];
+	
+	generateLocationArray( processedPositions );
+	generatePossibilityCube( pCube );
+	setTestBoard( baseBoard, testBoard );
+	if( solved_board( baseBoard ))
+	{
+		return true; // return true if board already complete
+	}
 
-    /* @processedLocations stores a 2d array position 
-     * correlated to @board. Positions are set to false
-     * untill @deleteIncorrectValues is called on 
-     * corresponding position in @board */
-
-    bool processedLocations[9][9];
-
-    generatePossibilityCube( pCube );
-    generateLocationArray( processedLocations );
-
-
-    // while eliminating board posibilities is not exausted...
-    while( ! processedAllPositions( board, processedLocations ))
-    {
-        //... logicaly remove possible values for each position from @pCube
-        elimPossibles( board, processedLocations, pCube /*r=0,c=0*/ );
-		for(int r=0; r < 9; r++)
+	for(int row = 0; row < 9; row++)
+	{
+		for(int col = 0; col < 9; col++)
 		{
-			for(int c=0; c<9; c++)
+			if( isDigit( testBoard[row][col] ))
 			{
-				successfulElimination( board, pCube, r, c);
+				continue;
+			}
+			else
+			{
+				for( int seed='1'; seed <= '9'; seed++)
+				{
+					generateLocationArray( processedPositions );
+					generatePossibilityCube( pCube );
+
+					testBoard[row][col] = seed;
+        			while( ! processedAllPositions( testBoard, processedPositions )) { 
+        				elimPossibles( testBoard, processedPositions , pCube /*r=0,c=0*/ );
+  						for(int r=0; r < 9; r++)
+  						{
+  							for(int c=0; c<9; c++)
+  							{
+  								successfulElimination( testBoard, pCube, r, c);
+  							}
+  						}
+        			}
+					display_board( testBoard );
+					if( solved_board( testBoard ) )
+					{
+						setTestBoard( testBoard, baseBoard ); // write correct board to base
+						return true;
+					}
+					setTestBoard( baseBoard, testBoard );
+				}
 			}
 		}
-        
-    }
-
-    if( solved_board( board )) // if board is now complete
-    {
-        return true;  // return completion signal
-    }
-    cout << "No solution found: " << endl << endl;
-    display_board( board );
-    return false;
-//    else // Board requires guesswork then more elimination.
-//    {
-//
-//        char guessValue = '9'; 
-//
-//        char emptyPosition[2];
-//        int arrayLocation[2];
-//        do 
-//        {
-//
-//            // add a seed value to board at a position and try and solve.
-//            if(guessValue <= '9')
-//            {
-//                seed_board( board, emptyPosition, guessValue ); 
-//                arrayLocation[0] = alphaToNum( emptyPosition[0] ) - 48;
-//                arrayLocation[1] = emptyPosition[1] - 48;
-//            }
-//            board[arrayLocation[0]][arrayLocation[1]] = guessValue;
-//            
-//            while( ! processedAllPositions( board, processedLocations ))
-//            { 
-//                elimPossibles( board, processedLocations, pCube /*r=0,c=0*/ );
-//				display_board( board );
-//            }
-//            guessValue++; // try another seed value
-//        } // whilst not solved.
-//        while( ! solved_board( board ) || guessValue <= '9' ); 
-//
-//
-//        if( solved_board( board )) // After trying all seed values, if solved...
-//        {
-//            return true; // return completion signal
-//        }
-//        else // board is insolvable
-//        {
-//            cout << "Insolvable Board!!!" << endl;
-//            return false; // 
-//        }
-//    }
+	}
+	return false; // board insolveable
+}
+void setTestBoard( char baseBoard[][9], char testBoard[][9] )
+{
+	for(int r=0;r<9;r++)
+	{
+		for(int c=0;c<9;c++)
+		{
+			testBoard[r][c] = baseBoard[r][c];
+		}
+	}
 }
 
 void elimRowPossibles( char pCube[][9][9], char board[][9], int row, int col,
@@ -299,7 +277,6 @@ bool processedAllPositions( char board[][9], bool processedPositions[][9] )
         {
             if( (board[row][col] != '.') && (processedPositions[row][col] == false ))
             { 
-				cout << "we never make it here" << endl;
                 return false; // Return false if positions still need processing
             }
         }
@@ -408,26 +385,20 @@ char alphaToNum( char alphaRepresentation )
 	return alphaRepresentation - 16;
 }
 
-bool seed_board( char board[][9], char findGuessPosition[], char guessVal  )
+void seed_board( char board[][9], int &r, int &c, char guessVal  )
 {
-	char findGuessPos[3];
-
-    for(char r='A'; r<'J'; r++)
-    {
-        for(int c='1'; c<':'; c++)
-        {
-            findGuessPos[0] = r;
-            findGuessPos[1] = c;
-			findGuessPos[2] = 0;
-            if(make_move( findGuessPos, guessVal, board ))
-            {
-				findGuessPosition[0] = findGuessPos[0];
-				findGuessPosition[1] = findGuessPos[1];
-                return true;
-            }
-        }
-    }
-    return false;
+	// r, c = 0
+	for(; r<9; r++)
+	{
+		for(; c<9; c++)
+		{
+			if(! isDigit( board[r][c] )) // if not a digit
+			{
+				board[r+1][c-1] = guessVal; // change seedboard
+				return;
+			}
+		}
+	}
 }
 
 bool make_move( const char *position, const char value, char board[][9] )
@@ -474,11 +445,10 @@ bool inputValueToBoard( char inputDigit, char* position )
 
 void updateBoard( char board[][9], int row, int col, char correctVal )
 {
-	cout << "Adding " << correctVal << " to board. " << endl;
     board[row][col] = correctVal;
 }
 
-bool onlyViableFieldPosition( char board[][9], int row, int col, int posVal )
+bool onlyViableFieldPosition( char pCube[][9][9], int row, int col, int posVal )
 {
     //find the field position
     int fieldRow = row % 3;
@@ -497,7 +467,7 @@ bool onlyViableFieldPosition( char board[][9], int row, int col, int posVal )
             {
                 continue;
             }
-			else if( posVal == board[rloc][cloc] )
+			else if( pCube[row][col][posVal] == pCube[rloc][cloc][posVal] )
 			{
 				onlyViablePosition = false;
 			}
@@ -521,7 +491,7 @@ bool successfulElimination( char board[][9], char pCube[][9][9],
         {
             counter++;
             correctValue = pCube[row][col][posVal];
-			if( onlyViableFieldPosition( board, row, col, posVal ))
+			if( onlyViableFieldPosition( pCube, row, col, posVal ))
 		    // if no other place where value can go in field	
 			{
 				updateBoard( board, row, col, correctValue );
@@ -561,32 +531,3 @@ bool isDigit( char boardPosition )
 	}
 }
 
-///////////// DRIVER FUNCTIONS TO BE REMOVED
-
-char* getFileName()
-{
-	char* fileName;
-	fileName = new char[MAX_FILE_NAME_LENGTH];
-
-	cout << "Enter sudoku board file name > ";
-	cin.getline( fileName, MAX_FILE_NAME_LENGTH );
-
-	return fileName; // return the pointer to use at argument for @load_board
-}
-
-char* getPositionCoordinates()
-{
-    char* position; // create pointer
-    position = new char[10]; // create char array on heap
-    cout << "Please enter position > ";
-    cin.getline( position, 3 );
-    return position;
-}
-
-char getPositionValue()
-{
-    char value;
-    cout << "Please enter value for position > ";
-    cin.get(value);
-    return value;
-}
