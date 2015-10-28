@@ -14,26 +14,38 @@ void display_board(const char board[9][9]);
 
 ///////////////////////////////// My functions 
 
-void setTestBoard( char baseBoard[9][9], char testBoard[9][9] );
+bool is_complete( char board[9][9] );
+/* Returns true if each position of the sudoku 
+ * board @board contains a digit. NOTE: Does   
+ * not check @board for correctness. */
 
+bool make_move( const char *coordinate, const char value, char board[9][9] );
+/* Tries to input the user specified @value at 
+ * the location of @coordinate, on the @board.
+ * Returns false if there is input failure */
 
-bool onlyViableFieldPosition( char pCube[9][9][9], int row,
-							  int col, int posVal );
+bool save_board( const char *outputFileName, char board[9][9] );
+/* Saves a boards current state to a .dat file of name
+ * @outputFileName. .dat file format is readable by
+ * @load_board. */
 
 bool solve_board( char board[9][9] );
-/* solves a sudoku board */
-
-char alphaToNum( char alphaRepresentation );
-/* changes alpha char 'A' - 'I' to digit char '1' - '9'*/
-
-void seed_board( char board[9][9], int &r, int &c, 
-                 char guessVal );
-/* Finds the first empty position from 0,0 and inputs the
- * value of @guessVal*/
+/* Solves a sudoku board. */
+/* Finds the first blank position on @board and seeds it.
+ * Then calls @elimPossibles to find the possible values for
+ * each position. Once elimPossibles reaches the end of a 
+ * constraint set, the board will either be solved or not.
+ * It not, reseed the position and try again */
 
 void elimPossibles(char board[9][9], bool procLoc[9][9],
-                   char pCube[9][9][9], int row=0, 
-                   int col=0, char setBoard='n');
+                   char pCube[9][9][9], int row=0,
+				   int col=0); 
+/* Major recursive funtion which calls helper funtions
+ * to logically eliminate digits in @pCube, based on the
+ * digits suppied by @board. Function ends when 
+ * every unprocessed digit on board has been used to 
+ * eliminate possible digits in pCube, pCube as a sparse
+ * 3dArray */ 
 
 void elimRowPossibles( char pCube[9][9][9], char board[9][9],
                        int row, int col, int indexToEliminate,
@@ -72,6 +84,23 @@ bool successfulElimination( char board[9][9], char pCube[9][9][9], int row, int 
  * remaining possibility. If true, this char is submitted to
  * @board using @updateBoard. */
 
+bool onlyViableFieldPosition( char pCube[9][9][9], int row,
+							  int col, int posVal );
+/* Called by @successfulElimination. Checks if the digit 
+ * at the current cells is the only possible position for
+ * the digit in the field. Returns true if so. */
+
+char alphaToNum( char alphaRepresentation );
+/* changes alpha char 'A' - 'I' to digit char '1' - '9'*/
+
+void seed_board( char board[9][9], int &r, int &c, 
+                 char guessVal );
+/* Finds the first empty position from 0,0 and inputs the
+ * value of @guessVal*/
+
+void setTestBoard( char baseBoard[9][9], char testBoard[9][9] );
+/* resets the testBoard to the value of baseBoard */
+
 bool solved_board( char board[9][9] );
 /* Sums each row, and sums each column of a board. Signals
  * board is solved by returning true, if each column or each
@@ -90,12 +119,7 @@ void generateLocationArray( bool processedLocs[9][9] );
  * has been called on the position. Important for deciding board
  * solvability. */
 
-bool save_board( const char *outputFileName, char board[9][9] );
-/* Saves a boards current state to a .dat file of name
- * @outputFileName. .dat file format is readable by
- * @load_board. */
-
-bool inputValueToBoard( char inputDigit, char* position );
+bool inputValueToBoard( char inputDigit, char* inputLocation );
 /* Adds @inputDigit to the board at *@position. Uses array
  * coordinates, rather than user alpha-num coordinates.
  * Returns false if @inputDigit is out of range. Range: 1-9
@@ -105,10 +129,6 @@ char alphaCharToNumChar( char alphaRepresentation );
 /* Converts chars 'A' - 'I' into
  * chars '1' - '9' */
 
-char* getFileName(); // DRIVER FUNCTION
-/* Promts user to input filename 
- * helper function for @load_board */
-
 bool inRange( int index );
 /* Identifies if an integer value which will be
  * used to specify an array index on the sudoku board
@@ -117,25 +137,5 @@ bool inRange( int index );
 bool isDigit( char boardPosition );
 /* Returns true if value of @boardPosition is
  * a char digit. */ 
-
-bool is_complete( char board[9][9] );
-/* Returns true if each position of the sudoku 
- * board @board contains a digit. NOTE: Does   
- * not check @board for correctness. */
-
-char* getPositionCoordinates(); // DRIVER FUNCTION
-/* Prompts user for the board coordinates where
- * the user would like to make their next move */
-
-char getPositionValue(); // DRIVER FUNCTION
-/* Prompts the user for the value they wish to input
- * at the board coordinates specified in
- * @getPositionCoordinates */
-
-bool make_move( const char *coordinate, const char value, char board[9][9] );
-/* Tries to input the user specified @value at 
- * the location of @coordinate, on the @board.
- * Returns false if there is input failure */
-
 
 #endif

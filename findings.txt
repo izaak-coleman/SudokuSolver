@@ -1,1 +1,98 @@
 Summarise your findings here (see specification).
+
+On the various unsolved boards,
+running unix command 'time(./sudoku )' yeilds results:
+
+
+mystery1.dat
+
+mystery2.dat
+	real	0m0.010s
+	user	0m0.004s
+	sys		0m0.005s
+
+mystery2.dat
+	real	0m0.124s
+	user	0m0.118s
+	sys		0m0.004s
+
+  A solution could not be found to mystery2.dat.
+	So mystery2.dat is insolvable board.
+
+mystery3.dat
+	real	0m0.014s
+	user	0m0.010s
+	sys	  0m0.000s
+
+Although, it has to be noted, running 'time(./sudoku)'
+for the same board multiple times results in different time results.
+In the case of 'real', this is probably due to other
+processes altering the runtime. 
+
+'user' + 'sys' give 'total cpu time' used by ./sudoku 
+process. Even this value is not constant, although, it has
+a vary low variance (~0.002s). The results of the average
+of ten executions for 'total cpu time':
+
+mystery1.dat
+	0.0098s
+
+mystery3.dat
+	0.0092s
+
+diabolical.dat
+  0.0511
+
+Based on the tiny time average differences between
+mystery1.dat and mystery3.dat, there is no
+significant differences between run times. So I cannot
+distinguish between hard and extreme. However,
+I ran a diabolical sudoku board I found online at
+(https://www.sudokuoftheday.com/free/free-diabolical-sudoku/)
+and the runtime results are significantly different. Suggesting
+that, runtime does significantly change with board difficulty, 
+and therefore, although one is more difficult than the other, the 
+difference in difficulty between mystery1.dat and mystery3.dat 
+cannot be too large.
+
+I therefore looked at the number of times elimPossibles
+recursed in order to solve each board.
+
+mystery1.dat
+	12831
+
+mystery3.dat
+	16471
+
+diabolical.dat
+ 	128492
+
+mystery2.dat -- although, board was insolvable
+	321685
+
+After this, It suggests mystery1.dat was the hard board,
+and mystery3.dat was extremely hard. Again, with the board
+difficulty the number of elimPossibles calls increased.
+
+Finally, a common idea in sudoku is the idea of stopping sets.
+A stopping set results when, after some deductions, it is not
+possible to deduce any new digits from the digits that are
+currently on the board. This is when guessing must ensue.
+Boards easy.dat and medium.dat are one stopping set, requiring
+no guessing, only deduction. In mystery1,3.dat i'm guessing the board is 
+divided into such stopping sets. And it is therefore only
+possible to solve the board, if you guess at a position outside
+these stopping sets. My algorithim deduces positions untill it reaches a stopping
+set, upon which it begins guessing at a position outside of a stopping set.
+
+Because it guesses from '1' - '9', the closer the correct value of the position
+is to '1', the faster the board will be solved, and the less recursions of 
+elimPossibles will be required. Therefore, even though it is probable that
+mystery1.dat is the hard board and mystery3.dat is extremely hard, it cannot 
+be said conclusively.
+
+
+
+
+
+
