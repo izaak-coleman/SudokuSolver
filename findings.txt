@@ -5,16 +5,14 @@ running unix command 'time(./sudoku )' yeilds results:
 
 
 mystery1.dat
+	real  0m0.010s
+	user  0m0.004s
+	sys   0m0.005s
 
 mystery2.dat
-	real	0m0.010s
-	user	0m0.004s
-	sys		0m0.005s
-
-mystery2.dat
-	real	0m0.124s
-	user	0m0.118s
-	sys		0m0.004s
+	real  0m0.124s
+	user  0m0.118s
+	sys	  0m0.004s
 
   A solution could not be found to mystery2.dat.
 	So mystery2.dat is insolvable board.
@@ -22,7 +20,7 @@ mystery2.dat
 mystery3.dat
 	real	0m0.014s
 	user	0m0.010s
-	sys	  0m0.000s
+	sys   0m0.000s
 
 Although, it has to be noted, running 'time(./sudoku)'
 for the same board multiple times results in different time results.
@@ -35,10 +33,10 @@ a vary low variance (~0.002s). The results of the average
 of ten executions for 'total cpu time':
 
 mystery1.dat
-	0.0098s
+ 	0.0098s
 
 mystery3.dat
-	0.0092s
+ 	0.0092s
 
 diabolical.dat
   0.0511
