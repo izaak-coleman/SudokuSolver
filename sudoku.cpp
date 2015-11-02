@@ -78,8 +78,8 @@ bool is_complete( char board[][9] )
       if (! isDigit( board[row][col] )){
         return false;                     // return false if finds a non digit
       }
-		}
-	}
+    }
+  }
   return true;                            // if only digits, board complete
 }
 
@@ -208,8 +208,8 @@ bool solve_board( char baseBoard[][9] )
                 successfulElimination( testBoard, pCube, r, c);
                   // ... reprocess.
               }
-						}
-					}
+            }
+          }
 
           // Once constraint sets exausted, check if board is solved.
           if( solved_board( testBoard )){ // if solved...
@@ -222,9 +222,9 @@ bool solve_board( char baseBoard[][9] )
            * was picked. Reset, and try again.*/
           setTestBoard( baseBoard, testBoard ); 
         }
-			}
-		}
-	}
+      }
+    }
+  }
 
   return false; // Board insolvable
 }
@@ -282,7 +282,7 @@ void elimRowPossibles( char pCube[][9][9], char board[][9], int row, int col,
       pCube[rowIt][col][indexToEliminate] = 0;
       elimRowPossibles( pCube, board, row, col, indexToEliminate, rowIt+1);
     }
-	}
+  }
 }
 
 void elimColPossibles( char pCube[][9][9], char board[][9], int row, int col,
@@ -298,7 +298,7 @@ void elimColPossibles( char pCube[][9][9], char board[][9], int row, int col,
       pCube[row][colIt][indexToEliminate] = 0;
       elimColPossibles( pCube, board, row, col, indexToEliminate, colIt+1 );
     }
-	}
+  }
 }
 
 void elimFieldPossibles( char pCube[][9][9], char board[][9], int row, int col,
@@ -322,8 +322,8 @@ void elimFieldPossibles( char pCube[][9][9], char board[][9], int row, int col,
       else{   
         pCube[rloc][cloc][indexToEliminate] = 0;
       }
-		}
-	}
+    }
+  }
 }
 
 void setSuppliedVals( char pCube[][9][9], char board[][9], 
@@ -353,8 +353,8 @@ bool processedAllPositions( char board[][9], bool processedPositions[][9] )
       { 
         return false; // Return false if positions still need processing
       }
-		}
-	}
+    }
+  }
 
   return true; // Constraint sets exausted, no new positions can be found
 }
@@ -378,8 +378,8 @@ bool successfulElimination( char board[][9], char pCube[][9][9],
         return true; // ... it has to go at current location
                      // so submit value to board.
       }
-		}
-	}
+    }
+  }
 
   if( counter == 1 ){ // if this is the only possibility left at location
 
@@ -396,7 +396,7 @@ void setTestBoard( char baseBoard[][9], char testBoard[][9] )
     for(int c=0;c<9;c++){
       testBoard[r][c] = baseBoard[r][c]; // set @testboard to original
     }
-	}
+  }
 }
 
 bool solved_board( char board[][9] )
@@ -419,8 +419,8 @@ bool solved_board( char board[][9] )
         colSum = 0;
         rowSum = 0;
       }
-		}
-	}
+    }
+  }
 
   return true; // else, return board solved!!
 }
@@ -431,7 +431,7 @@ void generateLocationArray( bool processedLocs[][9] )
     for( int c=0; c < 9; ++c ){
       processedLocs[r][c] = false; // set each position to false
     }
-	}
+  }
 }
 
 void generatePossibilityCube( char pCube[][9][9] )
@@ -464,8 +464,8 @@ void seed_board( char board[][9], int &r, int &c, char guessVal  )
         board[r+1][c-1] = guessVal;     // and add seed
         return;
       }
-		}
-	}
+    }
+  }
 }
 
 
@@ -494,8 +494,8 @@ bool onlyViableFieldPosition( char pCube[][9][9], int row, int col, int posVal )
       else if( pCube[row][col][posVal] == pCube[rloc][cloc][posVal] ){
         onlyViablePosition = false; 
       }
-		}
-	}
+    }
+  }
   
   return onlyViablePosition;         // false if same value appeared in field
 }
