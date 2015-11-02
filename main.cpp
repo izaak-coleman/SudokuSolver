@@ -1,3 +1,7 @@
+/* Authour: Izaak Coleman */
+/* Last modified date: 02/11/15 */
+/* Last modified time: 18:26 */
+
 #include <iostream>
 #include <cstdio>
 #include "sudoku.h"

@@ -1,3 +1,13 @@
+/* Authour: Izaak Coleman */
+/* Last modified date: 02/11/15 */
+/* Last modified time: 18:22 */
+
+/* Note: When refering to 
+ * identifiers (parameter, function etc), '@' is 
+ * prefixed to the identifier name to expilcitly show 
+ * show the reference */
+
+
 #include <iostream>
 #include <fstream>
 #include <cstdio>

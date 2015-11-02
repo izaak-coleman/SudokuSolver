@@ -1,5 +1,6 @@
-// Authour: Izaak Coleman
-// Last modificaton : 00000
+/* Authour: Izaak Coleman */
+/* Last modification date: 02/11/15 */ 
+/* Last modification time: 18:24 */
 
 /* Note: When refering to 
  * identifiers (parameter, function etc), '@' is 
