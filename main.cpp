@@ -83,9 +83,9 @@ int main() {
     cout << "a valid move. The board is:" << endl;
     display_board(board);
 
-		// Board input value not in range
-    cout << "Putting '10' into I8 is ";
-    if (!make_move( "I8", '10', board)) cout << "NOT ";
+		// Board input value not in range, int input
+    cout << "Putting int 1 into I8 is ";
+    if (!make_move( "I8", 1, board)) cout << "NOT ";
     cout << "a valid move. The board is:" << endl;
     display_board(board);
 
